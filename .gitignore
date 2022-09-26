@@ -1,3 +1,8 @@
+.DS_Store
+.vscode/
+
+outputs/
+
 # Binaries for programs and plugins
 *.exe
 *.exe~
