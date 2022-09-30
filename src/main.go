@@ -3,7 +3,12 @@ package main
 // "sort"
 // "container/heap"
 
-type MatchBooth struct {
+import (
+	"fmt"
+	"os"
+)
+
+type TruthBooth struct {
 	Match   Match
 	Perfect bool
 }
@@ -23,7 +28,7 @@ type Condition interface {
 	IsMet(MatchSet) bool
 }
 
-func (c MatchBooth) IsMet(ms MatchSet) bool {
+func (c TruthBooth) IsMet(ms MatchSet) bool {
 	if ms.Has(c.Match) {
 		return c.Perfect
 	}
@@ -55,158 +60,147 @@ func (c MatchCeremony) IsMet(ms MatchSet) bool {
 // 	return out
 // }
 
-func GetPossibleMatches(Males []string, Females []string, Conditions []Condition) []MatchSet {
-	nextMaleOrdering := Permutations(Males)
-	nextMatches := func() MatchSet {
-		newMales := nextMaleOrdering()
-		if newMales == nil {
-			return nil
-		}
-		matches := make([]Match, len(newMales))
-		for i, male := range newMales {
-			matches[i] = Match{male, Females[i]}
-		}
-		return NewMatchSet(matches)
-	}
-
-	possibleMatchSets := []MatchSet{}
-	for i := 0; ; i++ {
-		matches := nextMatches()
-		if matches == nil {
-			break
-		}
-		allMet := true
-		for _, c := range Conditions {
-			allMet = allMet && c.IsMet(matches)
-			if !c.IsMet(matches) {
-			}
-		}
-		if allMet {
-			possibleMatchSets = append(possibleMatchSets, matches)
-		}
-	}
-
-	return possibleMatchSets
-}
-
 func main() {
-	males := []string{"Joshy", "Jack", "Charlie", "Jacob", "Jordan", "Theo", "Josh", "Juan", "Cach", "Ismail"}
-	females := []string{"Tasha", "Shae", "Thea", "Vic", "Robyn", "Libby", "Taofiqah", "Tersea", "Sapphia", "Olivia"}
-	conditions := []Condition{
-		MatchBooth{Match{"Joshy", "Tasha"}, false},
-		MatchBooth{Match{"Josh", "Taofiqah"}, false},
-		MatchBooth{Match{"Theo", "Robyn"}, false},
-		MatchBooth{Match{"Juan", "Thea"}, false},
-		MatchBooth{Match{"Ismail", "Olivia"}, true},
-		MatchBooth{Match{"Cach", "Thea"}, false},
-		MatchBooth{Match{"Charlie", "Thea"}, false},
-		MatchCeremony{
-			NewMatchSet([]Match{
-				{"Jack", "Shae"},
-				{"Charlie", "Thea"},
-				{"Jacob", "Vic"},
-				{"Jordan", "Robyn"},
-				{"Joshy", "Libby"},
-				{"Theo", "Tasha"},
-				{"Josh", "Taofiqah"},
-				{"Juan", "Tersea"},
-				{"Cach", "Sapphia"},
-				{"Ismail", "Olivia"},
-			}),
-			2,
-		},
-		MatchCeremony{
-			NewMatchSet([]Match{
-				{"Jacob", "Vic"},
-				{"Cach", "Taofiqah"},
-				{"Charlie", "Shae"},
-				{"Joshy", "Robyn"},
-				{"Josh", "Libby"},
-				{"Theo", "Tasha"},
-				{"Juan", "Thea"},
-				{"Jack", "Tersea"},
-				{"Jordan", "Sapphia"},
-				{"Ismail", "Olivia"},
-			}),
-			3,
-		},
-		MatchCeremony{
-			NewMatchSet([]Match{
-				{"Jacob", "Vic"},
-				{"Cach", "Sapphia"},
-				{"Charlie", "Shae"},
-				{"Joshy", "Robyn"},
-				{"Josh", "Tersea"},
-				{"Theo", "Taofiqah"},
-				{"Juan", "Thea"},
-				{"Jack", "Libby"},
-				{"Jordan", "Tasha"},
-				{"Ismail", "Olivia"},
-			}),
-			2,
-		},
-		MatchCeremony{
-			NewMatchSet([]Match{
-				{"Joshy", "Vic"},
-				{"Theo", "Sapphia"},
-				{"Cach", "Shae"},
-				{"Jacob", "Robyn"},
-				{"Josh", "Tersea"},
-				{"Jack", "Taofiqah"},
-				{"Charlie", "Thea"},
-				{"Jordan", "Libby"},
-				{"Juan", "Tasha"},
-				{"Ismail", "Olivia"},
-			}),
-			3,
-		},
-		MatchCeremony{
-			NewMatchSet([]Match{
-				{"Joshy", "Robyn"},
-				{"Theo", "Libby"},
-				{"Cach", "Taofiqah"},
-				{"Jacob", "Vic"},
-				{"Josh", "Thea"},
-				{"Jack", "Tersea"},
-				{"Charlie", "Sapphia"},
-				{"Jordan", "Shae"},
-				{"Juan", "Tasha"},
-				{"Ismail", "Olivia"},
-			}),
-			3,
-		},
-		MatchCeremony{
-			NewMatchSet([]Match{
-				{"Jordan", "Robyn"},
-				{"Charlie", "Libby"},
-				{"Juan", "Taofiqah"},
-				{"Theo", "Vic"},
-				{"Joshy", "Thea"},
-				{"Jacob", "Tersea"},
-				{"Jack", "Sapphia"},
-				{"Cach", "Shae"},
-				{"Josh", "Tasha"},
-				{"Ismail", "Olivia"},
-			}),
-			2,
-		},
-		MatchCeremony{
-			NewMatchSet([]Match{
-				{"Jordan", "Taofiqah"},
-				{"Charlie", "Shae"},
-				{"Juan", "Tersea"},
-				{"Theo", "Libby"},
-				{"Joshy", "Vic"},
-				{"Jacob", "Thea"},
-				{"Jack", "Robyn"},
-				{"Cach", "Sapphia"},
-				{"Josh", "Tasha"},
-				{"Ismail", "Olivia"},
-			}),
-			1,
-		},
+	jsonData, err := os.ReadFile("data/uk.json")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	showData := ParseShowData(jsonData)
+	var conditions []Condition
+	// conditions = append(conditions, showData.TruthBooths...)
+	// ^ this doesn't work because Go is dumb, no idea why
+	for _, tb := range showData.TruthBooths {
+		conditions = append(conditions, tb)
+	}
+	for _, mc := range showData.MatchCeremonies {
+		conditions = append(conditions, mc)
 	}
 
-	possibleMatchSets := GetPossibleMatches(males, females, conditions)
-	PrintStats(possibleMatchSets, males, females)
+	possibleMatches := GetPossibleMatches(
+		showData.Males,
+		showData.Females,
+		conditions,
+	)
+	PrintStats(possibleMatches, showData.Males, showData.Females)
+
+	// males := []string{"Joshy", "Jack", "Charlie", "Jacob", "Jordan", "Theo", "Josh", "Juan", "Cach", "Ismail"}
+	// females := []string{"Tasha", "Shae", "Thea", "Vic", "Robyn", "Libby", "Taofiqah", "Tersea", "Sapphia", "Olivia"}
+	// conditions := []Condition{
+	// 	TruthBooth{Match{"Joshy", "Tasha"}, false},
+	// 	TruthBooth{Match{"Josh", "Taofiqah"}, false},
+	// 	TruthBooth{Match{"Theo", "Robyn"}, false},
+	// 	TruthBooth{Match{"Juan", "Thea"}, false},
+	// 	TruthBooth{Match{"Ismail", "Olivia"}, true},
+	// 	TruthBooth{Match{"Cach", "Thea"}, false},
+	// 	TruthBooth{Match{"Charlie", "Thea"}, false},
+	// 	MatchCeremony{
+	// 		NewMatchSet([]Match{
+	// 			{"Jack", "Shae"},
+	// 			{"Charlie", "Thea"},
+	// 			{"Jacob", "Vic"},
+	// 			{"Jordan", "Robyn"},
+	// 			{"Joshy", "Libby"},
+	// 			{"Theo", "Tasha"},
+	// 			{"Josh", "Taofiqah"},
+	// 			{"Juan", "Tersea"},
+	// 			{"Cach", "Sapphia"},
+	// 			{"Ismail", "Olivia"},
+	// 		}),
+	// 		2,
+	// 	},
+	// 	MatchCeremony{
+	// 		NewMatchSet([]Match{
+	// 			{"Jacob", "Vic"},
+	// 			{"Cach", "Taofiqah"},
+	// 			{"Charlie", "Shae"},
+	// 			{"Joshy", "Robyn"},
+	// 			{"Josh", "Libby"},
+	// 			{"Theo", "Tasha"},
+	// 			{"Juan", "Thea"},
+	// 			{"Jack", "Tersea"},
+	// 			{"Jordan", "Sapphia"},
+	// 			{"Ismail", "Olivia"},
+	// 		}),
+	// 		3,
+	// 	},
+	// 	MatchCeremony{
+	// 		NewMatchSet([]Match{
+	// 			{"Jacob", "Vic"},
+	// 			{"Cach", "Sapphia"},
+	// 			{"Charlie", "Shae"},
+	// 			{"Joshy", "Robyn"},
+	// 			{"Josh", "Tersea"},
+	// 			{"Theo", "Taofiqah"},
+	// 			{"Juan", "Thea"},
+	// 			{"Jack", "Libby"},
+	// 			{"Jordan", "Tasha"},
+	// 			{"Ismail", "Olivia"},
+	// 		}),
+	// 		2,
+	// 	},
+	// 	MatchCeremony{
+	// 		NewMatchSet([]Match{
+	// 			{"Joshy", "Vic"},
+	// 			{"Theo", "Sapphia"},
+	// 			{"Cach", "Shae"},
+	// 			{"Jacob", "Robyn"},
+	// 			{"Josh", "Tersea"},
+	// 			{"Jack", "Taofiqah"},
+	// 			{"Charlie", "Thea"},
+	// 			{"Jordan", "Libby"},
+	// 			{"Juan", "Tasha"},
+	// 			{"Ismail", "Olivia"},
+	// 		}),
+	// 		3,
+	// 	},
+	// 	MatchCeremony{
+	// 		NewMatchSet([]Match{
+	// 			{"Joshy", "Robyn"},
+	// 			{"Theo", "Libby"},
+	// 			{"Cach", "Taofiqah"},
+	// 			{"Jacob", "Vic"},
+	// 			{"Josh", "Thea"},
+	// 			{"Jack", "Tersea"},
+	// 			{"Charlie", "Sapphia"},
+	// 			{"Jordan", "Shae"},
+	// 			{"Juan", "Tasha"},
+	// 			{"Ismail", "Olivia"},
+	// 		}),
+	// 		3,
+	// 	},
+	// 	MatchCeremony{
+	// 		NewMatchSet([]Match{
+	// 			{"Jordan", "Robyn"},
+	// 			{"Charlie", "Libby"},
+	// 			{"Juan", "Taofiqah"},
+	// 			{"Theo", "Vic"},
+	// 			{"Joshy", "Thea"},
+	// 			{"Jacob", "Tersea"},
+	// 			{"Jack", "Sapphia"},
+	// 			{"Cach", "Shae"},
+	// 			{"Josh", "Tasha"},
+	// 			{"Ismail", "Olivia"},
+	// 		}),
+	// 		2,
+	// 	},
+	// 	MatchCeremony{
+	// 		NewMatchSet([]Match{
+	// 			{"Jordan", "Taofiqah"},
+	// 			{"Charlie", "Shae"},
+	// 			{"Juan", "Tersea"},
+	// 			{"Theo", "Libby"},
+	// 			{"Joshy", "Vic"},
+	// 			{"Jacob", "Thea"},
+	// 			{"Jack", "Robyn"},
+	// 			{"Cach", "Sapphia"},
+	// 			{"Josh", "Tasha"},
+	// 			{"Ismail", "Olivia"},
+	// 		}),
+	// 		1,
+	// 	},
+	// }
+
+	// possibleMatchSets := GetPossibleMatches(males, females, conditions)
+	// PrintStats(possibleMatchSets, males, females)
 }
