@@ -63,8 +63,6 @@ func GetPossibleMatches(Males []string, Females []string, Conditions []Condition
 		allMet := true
 		for _, c := range Conditions {
 			allMet = allMet && c.IsMet(matches)
-			if !c.IsMet(matches) {
-			}
 		}
 		if allMet {
 			possibleMatchSets = append(possibleMatchSets, matches)
