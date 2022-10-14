@@ -33,6 +33,14 @@
 		{
             "match": {"male": "Jacob", "female": "Vic"},
             "perfect": false
+        },
+        {
+            "match": {"male": "Joshy", "female": "Libby"},
+            "perfect": true
+        },
+        {
+            "match": {"male": "Charlie", "female": "Tasha"},
+            "perfect": true
         }
     ],
     "matchCeremonies" : [
@@ -155,6 +163,36 @@
                 {"male": "Ismail", "female": "Olivia"}
             ],
             "perfect": 6
+		},
+		{
+            "matches": [
+                {"male": "Jordan", "female": "Sapphia"},
+                {"male": "Charlie", "female": "Tasha"},
+                {"male": "Jack", "female": "Taofiqah"},
+                {"male": "Theo", "female": "Vic"},
+                {"male": "Joshy", "female": "Libby"},
+                {"male": "Jacob", "female": "Robyn"},
+                {"male": "Juan", "female": "Shae"},
+                {"male": "Cach", "female": "Tersea"},
+                {"male": "Josh", "female": "Thea"},
+                {"male": "Ismail", "female": "Olivia"}
+            ],
+            "perfect": 6
+		},
+		{
+            "matches": [
+                {"male": "Jordan", "female": "Sapphia"},
+                {"male": "Charlie", "female": "Tasha"},
+                {"male": "Jack", "female": "Tersea"},
+                {"male": "Theo", "female": "Taofiqah"},
+                {"male": "Joshy", "female": "Libby"},
+                {"male": "Jacob", "female": "Robyn"},
+                {"male": "Juan", "female": "Vic"},
+                {"male": "Cach", "female": "Shae"},
+                {"male": "Josh", "female": "Thea"},
+                {"male": "Ismail", "female": "Olivia"}
+            ],
+            "perfect": 10
 		}
     ]
 }
